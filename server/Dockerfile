@@ -1,11 +1,7 @@
-# 使用国内镜像源的Node.js基础镜像
-FROM ixnlx5suo70o70.xuanyuan.run/library/node:18-alpine
+FROM node:18-alpine
 
 # 设置工作目录
 WORKDIR /app
-
-# 设置npm国内镜像源
-RUN npm config set registry https://registry.npmmirror.com
 
 # 复制package.json和package-lock.json
 COPY package*.json ./
