@@ -10,7 +10,7 @@ services:
     volumes:
       - ./server/database:/app/database
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
     networks:
       - barcodesys-network
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
     build: ./client
     container_name: barcodesys-frontend
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       - backend
     networks:

@@ -12,8 +12,8 @@ RUN npm ci --only=production
 # 复制应用代码
 COPY . .
 
-# 初始化数据库
-RUN npm run init-db
+# 创建数据库目录
+RUN mkdir -p /app/database
 
 # 暴露端口
 EXPOSE 3000
