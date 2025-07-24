@@ -1,0 +1,48 @@
+{
+  "name": "enterprise-inventory-system",
+  "version": "1.0.0",
+  "description": "备品备件管理系统 - Spare Parts Management System",
+  "main": "server/server.js",
+  "scripts": {
+    "setup": "npm run install:server && npm run install:client && npm run init-db",
+    "install:server": "cd server && npm install",
+    "install:client": "cd client && npm install",
+    "init-db": "cd server && npm run init-db",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "start:server": "cd server && npm start",
+    "build:client": "cd client && npm run build",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "inventory",
+    "management",
+    "vue",
+    "nodejs",
+    "express",
+    "sqlite",
+    "barcode",
+    "enterprise"
+  ],
+  "author": "Enterprise Inventory System",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/enterprise-inventory-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/enterprise-inventory-system/issues"
+  },
+  "homepage": "https://github.com/your-username/enterprise-inventory-system#readme",
+  "dependencies": {
+    "vite": "^7.0.5"
+  }
+}

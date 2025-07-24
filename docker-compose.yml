@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # 后端服务
+  backend:
+    build: ./server
+    container_name: barcodesys-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data  # 数据库持久化
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/app/data/database.db
+    networks:
+      - barcodesys-network
+    restart: unless-stopped
+
+  # 前端服务
+  frontend:
+    build: ./client
+    container_name: barcodesys-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - barcodesys-network
+    restart: unless-stopped
+
+networks:
+  barcodesys-network:
+    driver: bridge
+
+volumes:
+  barcodesys-data:
+    driver: local
