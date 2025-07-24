@@ -8,8 +8,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/BARCODESYS.git
-cd BARCODESYS
+git clone https://github.com/GGPbadazz/SmallWareHouseManageSys.git
+cd SmallWareHouseManageSys
 
 # 一键部署
 ./deploy.sh
@@ -198,3 +198,7 @@ cd client && npm run build
 - `POST /api/transactions` - Transaction operations
 - `GET /api/reports` - Report generation
 - `GET /api/settings` - System configuration
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 详情请查看 [LICENSE](LICENSE) 文件
