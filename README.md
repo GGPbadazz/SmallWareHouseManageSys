@@ -1,10 +1,24 @@
 # 🏭 SmallWareHouseManageSys - 小型仓库管理系统
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2014.0-brightgreen)](https://nodejs.org/)
-[![Docker](https://img.shields.io/badge/docker-supported-blue)](https://www.docker.com/)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2014.0-b## 💻 系统要求
 
-一个专为小型企业和工厂设计的现代化仓库管理系统，支持备品备件管理、条码扫描、月度财务报表等功能。系统采用 Vue.js + Node.js + SQLite 技术栈，提供完整的Docker部署方案。
+### 运行环境
+- **Node.js**: >= 14.18.0 (推荐 18.x LTS)
+- **npm**: >= 6.14.0 (或 yarn >= 1.22.0)
+- **操作系统**: Windows 10+, macOS 10.15+, Ubuntu 18.04+
+- **浏览器**: Chrome 88+, Firefox 85+, Safari 14+, Edge 88+
+- **内存**: 最少 1GB RAM
+- **磁盘空间**: 最少 1GB 可用空间
+
+### 生产环境建议
+- **进程管理**: 使用 PM2 进行进程管理
+- **反向代理**: 使用 Nginx 作为反向代理服务器
+- **SSL证书**: 配置 HTTPS 以确保数据安全
+- **备份策略**: 定期备份 SQLite 数据库文件ttps://nodejs.org/)
+[![Vue.js](https://img.shields.io/badge/vue-3.x-green)](https://vuejs.org/)
+
+一个专为小型企业和工厂设计的现代化仓库管理系统，支持备品备件管理、条码扫描、月度财务报表等功能。系统采用 Vue.js + Node.js + SQLite 技术栈，轻量级部署，开箱即用。
 
 ## ✨ 核心功能
 
@@ -39,62 +53,42 @@
 
 ## 🚀 快速开始
 
-### 方式一：Docker 一键部署（推荐）
+### 本地部署
 
 ```bash
 # 1. 克隆项目
 git clone https://github.com/GGPbadazz/SmallWareHouseManageSys.git
 cd SmallWareHouseManageSys
 
-# 2. 一键部署
-chmod +x deploy.sh
-./deploy.sh
-
-# 3. 访问系统
-# 前端界面: http://localhost
-# 后端API:  http://localhost:3000
-```
-
-### 方式二：本地开发环境
-
-```bash
-# 1. 安装后端依赖并初始化数据库
+# 2. 安装后端依赖并初始化数据库
 cd server
-npm run setup
+npm install
+npm run init-db
 
-# 2. 安装前端依赖
+# 3. 启动后端服务
+npm run dev
+
+# 4. 安装前端依赖
 cd ../client
 npm install
 
-# 3. 启动开发服务器
-cd ..
-./start-dev.sh
+# 5. 启动前端开发服务器
+npm run dev
 
-# 4. 访问应用
-# 前端: http://localhost:5173
-# 后端: http://localhost:3000
+# 6. 访问系统
+# 前端界面: http://localhost:5173
+# 后端API:  http://localhost:3000
 ```
 
-## 🐳 Docker 部署命令
+### 快速启动脚本
 
 ```bash
-# 构建并启动所有服务
-docker-compose up --build -d
-
-# 查看服务运行状态
-docker-compose ps
-
-# 查看服务日志
-docker-compose logs -f [service_name]
-
-# 停止所有服务
-docker-compose down
-
-# 完全清理（包括数据卷）
-docker-compose down -v --rmi all
+# 使用提供的启动脚本
+chmod +x start-dev.sh
+./start-dev.sh
 ```
 
-## 🛠 技术架构
+##  技术架构
 
 ### 前端技术栈
 - **框架**: Vue.js 3 - 渐进式JavaScript框架
@@ -113,9 +107,9 @@ docker-compose down -v --rmi all
 - **验证**: Express-validator - 请求数据验证
 
 ### 部署技术
-- **容器化**: Docker & Docker Compose - 应用容器化和编排
-- **Web服务器**: Nginx - 高性能Web服务器和反向代理
-- **进程管理**: PM2 - Node.js进程管理器（可选）
+- **进程管理**: PM2 - Node.js进程管理器（推荐生产环境使用）
+- **反向代理**: Nginx - 高性能Web服务器（可选）
+- **静态资源**: Express Static - 内置静态文件服务
 
 ## 📁 项目结构
 
@@ -139,8 +133,7 @@ SmallWareHouseManageSys/
 │   │   ├── 📁 utils/             # 工具函数
 │   │   │   └── outboundRecordsExporter.js  # 出库记录导出工具
 │   │   └── 📁 views/             # 页面视图
-│   ├── 📄 Dockerfile             # 前端Docker配置
-│   ├── 📄 nginx.conf             # Nginx配置
+│   ├── 📄 nginx.conf             # Nginx配置（可选）
 │   └── 📄 package.json           # 前端依赖配置
 ├── 📁 server/                    # 后端Node.js应用
 │   ├── 📁 database/              # 数据库文件目录
@@ -155,11 +148,9 @@ SmallWareHouseManageSys/
 │   │   └── transactions.js      # 交易记录
 │   ├── 📁 services/              # 后端服务
 │   ├── 📄 init-database.js       # 数据库初始化脚本
-│   ├── 📄 Dockerfile             # 后端Docker配置
 │   └── 📄 server.js              # 服务器入口文件
-├── 📄 docker-compose.yml         # Docker编排配置
-├── 📄 deploy.sh                  # 一键部署脚本
 ├── 📄 start-dev.sh               # 开发环境启动脚本
+├── 📄 start-server.sh            # 服务器启动脚本
 └── 📄 README.md                  # 项目说明文档
 ```
 
@@ -304,28 +295,32 @@ transactions (
 
 ### 常见问题
 
-**Q1: Docker启动失败？**
+**Q1: Node.js 服务启动失败？**
 ```bash
-# 检查Docker服务状态
-sudo systemctl status docker
+# 检查Node.js版本
+node --version
+npm --version
 
-# 重启Docker服务
-sudo systemctl restart docker
+# 清理npm缓存
+npm cache clean --force
 
-# 查看详细错误日志
-docker-compose logs
+# 重新安装依赖
+rm -rf node_modules
+npm install
 ```
 
 **Q2: 端口占用问题？**
 ```bash
 # 查看端口占用情况
-lsof -i :80
-lsof -i :3000
+lsof -i :5173  # 前端默认端口
+lsof -i :3000  # 后端默认端口
 
-# 修改docker-compose.yml中的端口映射
-ports:
-  - "8080:80"    # 将80端口改为8080
-  - "3001:3000"  # 将3000端口改为3001
+# 杀死占用端口的进程
+kill -9 <PID>
+
+# 或者修改配置文件中的端口
+# client/vite.config.js - 修改前端端口
+# server/server.js - 修改后端端口
 ```
 
 **Q3: 数据库初始化失败？**
@@ -337,13 +332,25 @@ npm run init-db
 # 检查数据库文件权限
 ls -la database/
 chmod 644 database/inventory.db
+
+# 删除并重新创建数据库
+rm database/inventory.db
+npm run init-db
 ```
 
-**Q4: 前端页面无法访问？**
-- 检查浏览器是否禁用了JavaScript
-- 清除浏览器缓存和Cookie
-- 确认防火墙没有阻止相关端口
-- 检查nginx配置是否正确
+**Q4: 前端构建失败？**
+```bash
+# 检查Node.js版本兼容性
+node --version
+
+# 清理构建缓存
+cd client
+rm -rf node_modules dist .vite
+npm install
+
+# 重新构建
+npm run build
+```
 
 ### 性能优化建议
 
@@ -376,13 +383,14 @@ chmod 644 database/inventory.db
 
 ## 📋 更新日志
 
-### Version 1.0.0 (2025-07-24)
+### Version 1.0.0 (2025-07-26)
 - ✅ **核心功能完整**：库存管理、出入库、月度账本
 - ✅ **Excel导出优化**：完整月度账本 + 财务专用出库记录
-- ✅ **Docker支持**：一键部署，开箱即用
+- ✅ **轻量级部署**：基于Node.js的简单部署方案
 - ✅ **条码扫描**：多格式支持，快速识别
 - ✅ **财务友好**：突出领用单位、用途等关键信息
 - ✅ **界面优化**：现代化UI设计，响应式布局
+- ✅ **Docker-Free**：移除Docker依赖，简化部署流程
 
 ### 未来规划
 - 🔄 **用户权限系统**：多用户、角色权限管理
