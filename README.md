@@ -39,7 +39,7 @@
 
 ## 🚀 快速开始
 
-### 方式一：Docker 一键部署（推荐）
+### 🎯 **推荐方式：Docker 一键部署**
 
 ```bash
 # 1. 克隆项目
@@ -52,47 +52,95 @@ chmod +x deploy.sh
 
 # 3. 访问系统
 # 前端界面: http://localhost
-# 后端API:  http://localhost:3000
+# 后端API:  http://localhost:3003
 ```
 
-### 方式二：本地开发环境
+### 🛠 **本地开发模式**
 
 ```bash
 # 1. 安装后端依赖并初始化数据库
 cd server
-npm run setup
+npm install
+npm run init-db
 
 # 2. 安装前端依赖
 cd ../client
 npm install
 
 # 3. 启动开发服务器
-cd ..
-./start-dev.sh
+# 启动后端（新终端）
+cd server && npm run dev
+
+# 启动前端（新终端）
+cd client && npm run dev
 
 # 4. 访问应用
-# 前端: http://localhost:5173
-# 后端: http://localhost:3000
+# 前端: http://localhost:5715
+# 后端: http://localhost:3003
 ```
 
-## 🐳 Docker 部署命令
+### ⚡ **智能启动脚本**
 
 ```bash
-# 构建并启动所有服务
-docker-compose up --build -d
+# 开发模式（无Docker）
+./start.sh dev
 
-# 查看服务运行状态
-docker-compose ps
+# 带Nginx代理的开发模式
+./start.sh nginx
 
-# 查看服务日志
-docker-compose logs -f [service_name]
-
-# 停止所有服务
-docker-compose down
-
-# 完全清理（包括数据卷）
-docker-compose down -v --rmi all
+# 检查服务状态
+./start.sh status
 ```
+
+## 🐳 Docker 管理命令
+
+```bash
+# 启动服务
+./deploy.sh
+
+# 停止服务
+docker compose down
+
+# 查看服务状态
+docker compose ps
+
+# 查看日志
+docker compose logs -f
+
+# 重启服务
+docker compose restart
+
+# 清理并重新部署
+./deploy.sh --clean
+
+# 完全清理（删除所有数据）
+docker compose down -v --rmi all
+```
+
+## � Docker 架构
+
+本项目采用简化的 Docker 部署架构：
+
+```
+BARCODESYS/
+├── docker-compose.yml      # 统一的 Docker Compose 配置
+├── deploy.sh              # 一键部署脚本
+├── .env.example           # 环境变量示例
+├── server/
+│   ├── Dockerfile         # 后端容器配置
+│   └── ...
+├── client/
+│   ├── Dockerfile         # 前端容器配置 (nginx)
+│   ├── nginx.conf         # Nginx 配置
+│   └── ...
+└── DEPLOY.md             # 详细部署文档
+```
+
+### 🎯 设计特点
+- **统一配置**: 只保留一个 `docker-compose.yml` 文件
+- **环境变量**: 通过环境变量控制不同部署环境
+- **健康检查**: 内置服务健康监控
+- **数据持久化**: 自动处理数据库和备份目录挂载
 
 ## 🛠 技术架构
 

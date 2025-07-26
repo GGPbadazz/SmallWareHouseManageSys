@@ -6,26 +6,41 @@ services:
     build: ./server
     container_name: barcodesys-backend
     ports:
-      - "3000:3000"
+      - "${BACKEND_PORT:-3003}:3003"
     volumes:
       - ./server/database:/app/database
+      - ./server/backups:/app/backups
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=3003
     networks:
       - barcodesys-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3003/api/auth/verify", "--timeout=5"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # 前端服务
   frontend:
     build: ./client
     container_name: barcodesys-frontend
     ports:
-      - "8080:80"
+      - "${FRONTEND_PORT:-80}:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
     networks:
       - barcodesys-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80", "--timeout=5"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   barcodesys-network:

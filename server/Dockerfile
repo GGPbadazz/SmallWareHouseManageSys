@@ -19,7 +19,7 @@ COPY . .
 RUN mkdir -p /app/database
 
 # 暴露端口
-EXPOSE 3000
+EXPOSE 3003
 
 # 设置环境变量
 ENV NODE_ENV=production
