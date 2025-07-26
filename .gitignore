@@ -40,9 +40,6 @@ database.db
 ehthumbs.db
 Thumbs.db
 
-# Docker
-.dockerignore
-
 # Logs
 logs
 *.log
