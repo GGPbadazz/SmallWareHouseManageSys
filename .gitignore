@@ -14,9 +14,12 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env.prod
 
 # Database files - 不上传数据库
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
 database.db
