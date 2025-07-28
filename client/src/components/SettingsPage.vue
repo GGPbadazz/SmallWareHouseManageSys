@@ -702,14 +702,35 @@ export default {
     
     const downloadBackup = async () => {
       try {
+        showToast('正在生成备份...', 'info')
+        
         const response = await settingsAPI.exportData(['products', 'categories', 'projects', 'transactions'])
         const data = response.data
         
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+        // 添加备份元信息
+        const backupData = {
+          backup_info: {
+            created_at: new Date().toISOString(),
+            version: '1.0.0',
+            type: 'full_backup'
+          },
+          ...data
+        }
+        
+        // 创建JSON文件并下载
+        const jsonString = JSON.stringify(backupData, null, 2)
+        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' })
+        
+        const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
-        link.href = URL.createObjectURL(blob)
+        link.href = url
         link.download = `backup_${new Date().toISOString().split('T')[0]}.json`
+        link.style.display = 'none'
+        
+        document.body.appendChild(link)
         link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
         
         showToast('备份下载成功', 'success')
       } catch (error) {
@@ -746,19 +767,29 @@ export default {
     const downloadBackupFile = async (backup) => {
       try {
         showToast('备份下载中...', 'info')
+        
+        // 修复：使用正确的API调用方式
         const response = await settingsAPI.downloadBackup(backup.filename)
         
+        // 修复：确保response.data是Blob对象
+        const blob = response.data instanceof Blob ? response.data : new Blob([response.data])
+        
         // 创建下载链接
-        const blob = new Blob([response.data], { type: 'application/octet-stream' })
+        const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
-        link.href = URL.createObjectURL(blob)
+        link.href = url
         link.download = backup.filename
+        link.style.display = 'none'
+        
+        // 添加到DOM并触发下载
         document.body.appendChild(link)
         link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(link.href)
         
-        showToast('备份下载完成', 'success')
+        // 清理
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+        
+        showToast('备份下载成功', 'success')
       } catch (error) {
         console.error('下载备份失败:', error)
         showToast('备份下载失败: ' + (error.response?.data?.message || error.message), 'error')

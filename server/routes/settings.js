@@ -269,24 +269,43 @@ router.get('/backup/download/:filename', (req, res) => {
         const backupDir = path.join(__dirname, '../backups');
         const filePath = path.join(backupDir, filename);
 
-        // Security check - ensure filename is safe
-        if (!filename.match(/^backup_[\d\-T]+\.db$/)) {
+        // Security check - allow backup files with ISO timestamp format
+        // Pattern matches: backup_2025-07-26T15-06-48-972Z.db
+        if (!filename.match(/^backup_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z\.db$/)) {
+            console.log('Invalid filename format:', filename);
             return res.status(400).json({ error: 'Invalid filename format' });
         }
 
+        // Check if file exists
         if (!fs.existsSync(filePath)) {
             return res.status(404).json({ error: 'Backup file not found' });
         }
 
-        res.download(filePath, filename, (err) => {
-            if (err) {
-                console.error('Download error:', err);
-                res.status(500).json({ error: 'Failed to download backup file' });
+        // Get file stats
+        const stats = fs.statSync(filePath);
+        
+        // Set proper headers for file download
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Length', stats.size);
+
+        // Create read stream and pipe to response
+        const fileStream = fs.createReadStream(filePath);
+        
+        fileStream.on('error', (error) => {
+            console.error('File stream error:', error);
+            if (!res.headersSent) {
+                res.status(500).json({ error: 'Failed to read backup file' });
             }
         });
+
+        fileStream.pipe(res);
+        
     } catch (error) {
         console.error('Download backup error:', error);
-        res.status(500).json({ error: 'Failed to download backup file' });
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Failed to download backup file' });
+        }
     }
 });
 
@@ -300,8 +319,9 @@ router.delete('/backup/:filename', (req, res) => {
         const backupDir = path.join(__dirname, '../backups');
         const filePath = path.join(backupDir, filename);
 
-        // Security check - ensure filename is safe
-        if (!filename.match(/^backup_[\d\-T]+\.db$/)) {
+        // Security check - allow backup files with ISO timestamp format
+        // Pattern matches: backup_2025-07-26T15-06-48-972Z.db
+        if (!filename.match(/^backup_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z\.db$/)) {
             return res.status(400).json({ error: 'Invalid filename format' });
         }
 

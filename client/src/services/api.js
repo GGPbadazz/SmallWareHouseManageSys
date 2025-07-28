@@ -111,7 +111,10 @@ export const settingsAPI = {
   exportData: (tables) => api.get('/settings/export', { params: { tables: tables?.join(',') } }),
   createBackup: () => api.post('/settings/backup'),
   listBackups: () => api.get('/settings/backup/list'),
-  downloadBackup: (filename) => api.get(`/settings/backup/download/${filename}`, { responseType: 'blob' }),
+  downloadBackup: (filename, config = {}) => api.get(`/settings/backup/download/${filename}`, {
+    responseType: 'blob',
+    ...config
+  }),
   deleteBackup: (filename) => api.delete(`/settings/backup/${filename}`),
   cleanupSystem: (days) => api.post('/settings/cleanup', { days })
 }

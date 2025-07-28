@@ -1,7 +1,15 @@
 # 🏭 SmallWareHouseManageSys - 小型仓库管理系统
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2014.0-brightgreen)](https://nodejs.org/)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3## 📋 系统要求
+
+### 本地开发环境
+- **Node.js**: >= 14.18.0 (推荐 18.x LTS)
+- **npm**: >= 6.14.0 (或 yarn >= 1.22.0)
+- **操作系统**: Windows 10+, macOS 10.15+, Ubuntu 18.04+
+- **浏览器**: Chrome 88+, Firefox 85+, Safari 14+, Edge 88+
+- **内存**: 最少 2GB RAM
+- **磁盘空间**: 最少 1GB 可用空间tgreen)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/docker-supported-blue)](https://www.docker.com/)
 
 一个专为小型企业和工厂设计的现代化仓库管理系统，支持备品备件管理、条码扫描、月度财务报表等功能。系统采用 Vue.js + Node.js + SQLite 技术栈，提供完整的Docker部署方案。
@@ -39,59 +47,48 @@
 
 ## 🚀 快速开始
 
-### 方式一：Docker 一键部署（推荐）
+### 本地开发环境
 
 ```bash
 # 1. 克隆项目
 git clone https://github.com/GGPbadazz/SmallWareHouseManageSys.git
 cd SmallWareHouseManageSys
 
-# 2. 一键部署
-chmod +x deploy.sh
-./deploy.sh
-
-# 3. 访问系统
-# 前端界面: http://localhost
-# 后端API:  http://localhost:3000
-```
-
-### 方式二：本地开发环境
-
-```bash
-# 1. 安装后端依赖并初始化数据库
+# 2. 安装后端依赖并初始化数据库
 cd server
-npm run setup
+npm install
+npm run init-db
 
-# 2. 安装前端依赖
+# 3. 启动后端服务
+npm start
+
+# 4. 在新终端中安装并启动前端
 cd ../client
 npm install
+npm run dev
 
-# 3. 启动开发服务器
-cd ..
-./start-dev.sh
-
-# 4. 访问应用
+# 5. 访问应用
 # 前端: http://localhost:5173
-# 后端: http://localhost:3000
+# 后端: http://localhost:3003
 ```
 
-## 🐳 Docker 部署命令
+## � 开发命令
 
 ```bash
-# 构建并启动所有服务
-docker-compose up --build -d
+# 后端开发服务器 (带热重载)
+cd server
+npm run dev
 
-# 查看服务运行状态
-docker-compose ps
+# 前端开发服务器 (带热重载)
+cd client
+npm run dev
 
-# 查看服务日志
-docker-compose logs -f [service_name]
+# 构建生产版本
+cd client
+npm run build
 
-# 停止所有服务
-docker-compose down
-
-# 完全清理（包括数据卷）
-docker-compose down -v --rmi all
+# 运行测试
+npm test
 ```
 
 ## 🛠 技术架构
@@ -113,9 +110,8 @@ docker-compose down -v --rmi all
 - **验证**: Express-validator - 请求数据验证
 
 ### 部署技术
-- **容器化**: Docker & Docker Compose - 应用容器化和编排
-- **Web服务器**: Nginx - 高性能Web服务器和反向代理
-- **进程管理**: PM2 - Node.js进程管理器（可选）
+- **版本控制**: Git - 分布式版本控制系统
+- **包管理**: npm - Node.js包管理器
 
 ## 📁 项目结构
 
@@ -139,9 +135,8 @@ SmallWareHouseManageSys/
 │   │   ├── 📁 utils/             # 工具函数
 │   │   │   └── outboundRecordsExporter.js  # 出库记录导出工具
 │   │   └── 📁 views/             # 页面视图
-│   ├── 📄 Dockerfile             # 前端Docker配置
-│   ├── 📄 nginx.conf             # Nginx配置
-│   └── 📄 package.json           # 前端依赖配置
+│   ├── 📄 package.json           # 前端依赖配置
+│   └── 📄 vite.config.js         # Vite构建配置
 ├── 📁 server/                    # 后端Node.js应用
 │   ├── 📁 database/              # 数据库文件目录
 │   ├── 📁 routes/                # API路由
@@ -155,11 +150,10 @@ SmallWareHouseManageSys/
 │   │   └── transactions.js      # 交易记录
 │   ├── 📁 services/              # 后端服务
 │   ├── 📄 init-database.js       # 数据库初始化脚本
-│   ├── 📄 Dockerfile             # 后端Docker配置
+│   ├── 📄 package.json           # 后端依赖配置
 │   └── 📄 server.js              # 服务器入口文件
-├── 📄 docker-compose.yml         # Docker编排配置
-├── 📄 deploy.sh                  # 一键部署脚本
-├── 📄 start-dev.sh               # 开发环境启动脚本
+├── 📄 package.json               # 根配置文件
+├── 📄 start.sh                   # 应用启动脚本
 └── 📄 README.md                  # 项目说明文档
 ```
 
@@ -304,31 +298,21 @@ transactions (
 
 ### 常见问题
 
-**Q1: Docker启动失败？**
-```bash
-# 检查Docker服务状态
-sudo systemctl status docker
-
-# 重启Docker服务
-sudo systemctl restart docker
-
-# 查看详细错误日志
-docker-compose logs
-```
-
-**Q2: 端口占用问题？**
+**Q1: 端口占用问题？**
 ```bash
 # 查看端口占用情况
-lsof -i :80
-lsof -i :3000
+lsof -i :5173  # 前端端口
+lsof -i :3003  # 后端端口
 
-# 修改docker-compose.yml中的端口映射
-ports:
-  - "8080:80"    # 将80端口改为8080
-  - "3001:3000"  # 将3000端口改为3001
+# 杀死占用进程
+kill -9 <PID>
+
+# 或修改端口配置
+# 前端: 修改 vite.config.js 中的 server.port
+# 后端: 修改 server.js 中的 PORT 环境变量
 ```
 
-**Q3: 数据库初始化失败？**
+**Q2: 数据库初始化失败？**
 ```bash
 # 手动初始化数据库
 cd server
@@ -338,12 +322,24 @@ npm run init-db
 ls -la database/
 chmod 644 database/inventory.db
 ```
-
-**Q4: 前端页面无法访问？**
+**Q3: 前端页面无法访问？**
 - 检查浏览器是否禁用了JavaScript
 - 清除浏览器缓存和Cookie
-- 确认防火墙没有阻止相关端口
-- 检查nginx配置是否正确
+- 确认后端服务是否正常运行
+- 检查API接口地址配置是否正确
+
+**Q4: npm安装依赖失败？**
+```bash
+# 清除npm缓存
+npm cache clean --force
+
+# 删除node_modules重新安装
+rm -rf node_modules package-lock.json
+npm install
+
+# 使用国内镜像源
+npm config set registry https://registry.npmmirror.com/
+```
 
 ### 性能优化建议
 
@@ -376,10 +372,10 @@ chmod 644 database/inventory.db
 
 ## 📋 更新日志
 
-### Version 1.0.0 (2025-07-24)
+### Version 1.0.0 (2025-07-25)
 - ✅ **核心功能完整**：库存管理、出入库、月度账本
 - ✅ **Excel导出优化**：完整月度账本 + 财务专用出库记录
-- ✅ **Docker支持**：一键部署，开箱即用
+- ✅ **本地部署支持**：简化部署流程，专注核心功能
 - ✅ **条码扫描**：多格式支持，快速识别
 - ✅ **财务友好**：突出领用单位、用途等关键信息
 - ✅ **界面优化**：现代化UI设计，响应式布局
