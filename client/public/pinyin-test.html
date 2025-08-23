@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>拼音搜索测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        input { padding: 8px; margin: 10px; width: 200px; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>拼音搜索功能测试</h1>
+    
+    <div class="test-section">
+        <h3>测试数据</h3>
+        <div>产品名称：电热管、电热管件、一次性、电仪</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>拼音转换测试</h3>
+        <input type="text" id="testInput" placeholder="输入中文测试拼音转换" />
+        <button onclick="testPinyin()">转换</button>
+        <div id="pinyinResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>搜索匹配测试</h3>
+        <input type="text" id="searchInput" placeholder="输入英文测试搜索" />
+        <button onclick="testSearch()">搜索</button>
+        <div id="searchResult" class="result"></div>
+    </div>
+
+    <script type="module">
+        // 模拟拼音工具函数
+        import pinyin from '/node_modules/pinyin/lib/pinyin.js'
+        
+        const pinyinUtils = {
+            toFullPinyin(text) {
+                if (!text) return ''
+                return pinyin(text, {
+                    style: pinyin.STYLE_NORMAL,
+                    heteronym: false
+                }).join('').toLowerCase()
+            },
+            
+            toFirstLetters(text) {
+                if (!text) return ''
+                return pinyin(text, {
+                    style: pinyin.STYLE_FIRST_LETTER,
+                    heteronym: false
+                }).join('').toLowerCase()
+            },
+            
+            isMatch(text, query) {
+                if (!text || !query) return false
+                
+                const lowerQuery = query.toLowerCase()
+                const fullPinyin = this.toFullPinyin(text)
+                const firstLetters = this.toFirstLetters(text)
+                
+                return fullPinyin.includes(lowerQuery) || 
+                       firstLetters.includes(lowerQuery) ||
+                       fullPinyin.startsWith(lowerQuery) ||
+                       firstLetters.startsWith(lowerQuery)
+            }
+        }
+        
+        // 测试数据
+        const testProducts = [
+            { name: '电热管', category: '电仪' },
+            { name: '电热管件', category: '一次性' },
+            { name: '普通管子', category: '管材' },
+            { name: '热水器', category: '家电' }
+        ]
+        
+        window.testPinyin = function() {
+            const input = document.getElementById('testInput').value
+            const fullPinyin = pinyinUtils.toFullPinyin(input)
+            const firstLetters = pinyinUtils.toFirstLetters(input)
+            
+            document.getElementById('pinyinResult').innerHTML = `
+                <strong>输入:</strong> ${input}<br>
+                <strong>全拼:</strong> ${fullPinyin}<br>
+                <strong>首字母:</strong> ${firstLetters}
+            `
+        }
+        
+        window.testSearch = function() {
+            const query = document.getElementById('searchInput').value
+            const matches = testProducts.filter(product => 
+                pinyinUtils.isMatch(product.name, query) || 
+                pinyinUtils.isMatch(product.category, query)
+            )
+            
+            document.getElementById('searchResult').innerHTML = `
+                <strong>搜索:</strong> ${query}<br>
+                <strong>匹配结果:</strong><br>
+                ${matches.map(p => `- ${p.name} (${p.category})`).join('<br>')}
+            `
+        }
+    </script>
+</body>
+</html>

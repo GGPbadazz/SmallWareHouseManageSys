@@ -1,0 +1,18 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.DS_Store
+dist
+coverage
+.nyc_output
+.vscode
+*.log
+# 保留.npmrc用于镜像源配置
+!.npmrc

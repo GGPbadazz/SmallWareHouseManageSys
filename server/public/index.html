@@ -1,0 +1,2535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>备品备件仓库管理系统 | Spare Parts Warehouse Management System</title>
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2d3748;
+            --accent-color: #3182ce;
+            --success-color: #38a169;
+            --warning-color: #d69e2e;
+            --error-color: #e53e3e;
+            --background-color: #f7fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .navbar-logo {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .navbar-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .navbar-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+            width: 100%;
+        }
+
+        /* Page tabs */
+        .page-tabs {
+            display: flex;
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xs);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .page-tab {
+            flex: 1;
+            padding: var(--spacing-md);
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .page-tab.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .page-tab:hover:not(.active) {
+            background: var(--background-color);
+            color: var(--text-primary);
+        }
+
+        /* Page content */
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .card-body {
+            padding: var(--spacing-lg);
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+
+        .grid-cols-1 { grid-template-columns: 1fr; }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+        @media (max-width: 768px) {
+            .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            min-height: 44px;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: none;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .btn {
+            box-shadow: none !important;
+        }
+
+        .btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: none !important;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+            box-shadow: none !important;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-secondary);
+            border-color: var(--border-color);
+            box-shadow: none !important;
+        }
+
+        .btn-outline:hover {
+            background: var(--background-color);
+            color: var(--text-primary);
+            box-shadow: none !important;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: #2c5282;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            background: var(--surface-color);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            min-height: 44px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        /* Stats */
+        .stat-card {
+            text-align: center;
+            padding: var(--spacing-xl);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            margin-top: var(--spacing-xs);
+            font-weight: 500;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--error-color);
+        }
+
+        /* Search interface */
+        .search-interface {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+        }
+
+        @media (max-width: 768px) {
+            .search-interface {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .search-input {
+            padding-left: 3rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background: var(--background-color);
+        }
+
+        .search-result-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .search-result-details {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+
+        .search-result-stock {
+            font-weight: 600;
+            float: right;
+        }
+
+        .search-result-stock.low {
+            color: var(--error-color);
+        }
+
+        .search-result-stock.normal {
+            color: var(--success-color);
+        }
+
+        /* Product info */
+        .product-info {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            border: 1px solid var(--border-color);
+        }
+
+        .product-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .product-field:last-child {
+            border-bottom: none;
+        }
+
+        .product-field-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .product-field-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stock-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .stock-value.low {
+            color: var(--error-color);
+        }
+
+        .stock-value.normal {
+            color: var(--success-color);
+        }
+
+        /* Product list */
+        .product-list-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .product-list-item:hover {
+            background: var(--background-color);
+            transform: translateX(2px);
+        }
+
+        .product-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: var(--spacing-md);
+        }
+
+        .product-info-text {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .product-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .product-stock {
+            text-align: right;
+        }
+
+        .product-stock-number {
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .product-stock-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: var(--spacing-xs);
+        }
+
+        .product-stock-number.low {
+            color: var(--error-color);
+        }
+
+        .product-stock-number.normal {
+            color: var(--success-color);
+        }
+
+        /* Transaction item */
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .transaction-item:hover {
+            background: var(--background-color);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-type {
+            width: 60px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            margin-right: var(--spacing-md);
+        }
+
+        .transaction-type.in {
+            background: var(--success-color);
+        }
+
+        .transaction-type.out {
+            background: var(--error-color);
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-name {
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .transaction-details {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .transaction-quantity {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl) * 2;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.125rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .empty-state-subtext {
+            font-size: 0.875rem;
+        }
+
+        /* Loading state */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl);
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Quantity control */
+        .quantity-control {
+            margin-top: var(--spacing-lg);
+        }
+
+        .quantity-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-sm);
+        }
+
+        .btn-quantity {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            background: var(--surface-color);
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-quantity:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .quantity-display {
+            width: 80px;
+            height: 50px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            background: var(--surface-color);
+            color: var(--text-primary);
+        }
+
+        /* Operation buttons */
+        .operation-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .operation-mode-toggle {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: center;
+        }
+
+        .btn-lg {
+            padding: var(--spacing-lg) var(--spacing-xl);
+            font-size: 1rem;
+            min-height: 52px;
+        }
+
+        .btn-sm {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 0.75rem;
+            min-height: 36px;
+        }
+
+        /* Signature section */
+        .signature-section {
+            margin: var(--spacing-lg) 0;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--background-color);
+        }
+
+        .signature-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .signature-input-group input:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .signature-canvas {
+            width: 100%;
+            height: 150px;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            background: white;
+            cursor: crosshair;
+            display: block;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .signature-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Message styles */
+        .message {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 3000;
+            max-width: 300px;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            color: white;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: var(--success-color);
+        }
+
+        .message.error {
+            background: var(--error-color);
+        }
+
+        .message.warning {
+            background: var(--warning-color);
+        }
+
+        .message.info {
+            background: var(--accent-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Filter buttons */
+        .filter-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: center;
+        }
+
+        .filter-buttons .btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Progress bars */
+        .progress-bar-container {
+            width: 100%;
+            height: 4px;
+            background: var(--background-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-top: var(--spacing-sm);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Report sections */
+        .report-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-sm);
+        }
+
+
+
+        .init-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+        }
+
+        .init-stat span:first-child {
+            color: var(--text-secondary);
+        }
+
+        .init-stat span:last-child {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .init-recommendation {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: var(--spacing-sm);
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: var(--radius-sm);
+            font-style: italic;
+        }
+
+        /* Category management styles */
+        .category-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--surface-color);
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-description {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+
+
+        .report-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .report-item-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .report-item-value {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .report-item-value.warning {
+            color: var(--warning-color);
+        }
+
+        .report-item-value.error {
+            color: var(--error-color);
+        }
+
+        /* Category distribution */
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .category-count {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        /* Transaction history in reports */
+        .transaction-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: var(--background-color);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .transaction-summary-item {
+            text-align: center;
+        }
+
+        .transaction-summary-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .transaction-summary-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+
+        .transaction-summary-in {
+            color: var(--success-color);
+        }
+
+        .transaction-summary-out {
+            color: var(--error-color);
+        }
+
+        /* ...existing styles... */
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">
+                    <div class="navbar-logo">备</div>
+                    <div>
+                        <div class="navbar-title">备品备件仓库管理系统</div>
+                        <div class="navbar-subtitle">Spare Parts Warehouse Management System</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <!-- Page tabs -->
+            <div class="page-tabs">
+                <button class="page-tab active" onclick="switchPage('scanner')">
+                    🔍 快速搜索
+                </button>
+                <button class="page-tab" onclick="switchPage('inventory')">
+                    📦 库存管理
+                </button>
+                <button class="page-tab" onclick="switchPage('reports')">
+                    📊 报告中心
+                </button>
+                <button class="page-tab" onclick="switchPage('settings')">
+                    ⚙️ 系统设置
+                </button>
+            </div>
+
+            <!-- Scanner page -->
+            <div id="scanner-page" class="page-content active">
+                <!-- Statistics overview -->
+                <div class="grid grid-cols-4 mb-4">
+                    <div class="card">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalProducts">-</div>
+                            <div class="stat-label">总产品数</div>
+                            <div class="stat-change positive" id="totalProductsChange">-</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-card">
+                            <div class="stat-number" id="lowStockItems">-</div>
+                            <div class="stat-label">低库存警告</div>
+                            <div class="stat-change negative">需要补货</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-card">
+                            <div class="stat-number" id="todayTransactions">-</div>
+                            <div class="stat-label">今日交易</div>
+                            <div class="stat-change positive" id="todayTransactionsChange">-</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalValue">-</div>
+                            <div class="stat-label">库存总值</div>
+                            <div class="stat-change positive" id="totalValueChange">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search interface -->
+                <div class="search-interface">
+                    <!-- Search operations -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">产品搜索</div>
+                            <div class="card-subtitle">输入产品名称、条码或类别进行搜索</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">搜索产品</label>
+                                <div class="search-box">
+                                    <div class="search-icon">🔍</div>
+                                    <input 
+                                        type="text" 
+                                        id="quickSearchInput" 
+                                        class="form-control search-input"
+                                        placeholder="输入产品名称、条码或类别..."
+                                        autocomplete="off"
+                                        autofocus
+                                        oninput="performQuickSearch()"
+                                        onfocus="performQuickSearch()"
+                                        onkeyup="handleQuickSearchInput(event)"
+                                    />
+                                    <div id="quickSearchResults" class="search-results">
+                                        <!-- Search results will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="operation-buttons">
+                                <button class="btn btn-success btn-lg" id="btnIn" onclick="setOperation('IN')">
+                                    入库操作
+                                </button>
+                                <button class="btn btn-outline btn-lg" id="btnOut" onclick="setOperation('OUT')">
+                                    出库操作
+                                </button>
+                            </div>
+                            
+                            <!-- Operation Mode Toggle -->
+                            <div class="form-group">
+                                <label class="form-label">操作模式</label>
+                                <div class="operation-mode-toggle">
+                                    <button class="btn btn-outline btn-sm active" id="singleMode" onclick="setOperationMode('single')">
+                                        单品模式
+                                    </button>
+                                    <button class="btn btn-outline btn-sm" id="batchMode" onclick="setOperationMode('batch')">
+                                        批量模式
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Batch Operations Panel -->
+                            <div id="batchOperationsPanel" class="batch-operations-panel" style="display: none;">
+                                <div class="batch-header">
+                                    <h4>批量操作</h4>
+                                    <button class="btn btn-outline btn-sm" onclick="clearBatchList()">
+                                        🗑️ 清空列表
+                                    </button>
+                                </div>
+                                <div id="batchProductList" class="batch-product-list">
+                                    <!-- Batch products will be added here -->
+                                </div>
+                                
+                                <!-- Signature section for batch operations -->
+                                <div class="signature-section">
+                                    <label class="form-label">操作签名</label>
+                                    <div class="signature-input-group">
+                                        <input type="text" id="batchRequesterName" class="form-control" placeholder="请输入操作人员姓名" />
+                                        <input type="text" id="batchRequesterDept" class="form-control" placeholder="请输入部门" />
+                                        <input type="text" id="batchPurpose" class="form-control" placeholder="请输入操作目的" />
+                                    </div>
+                                    <canvas id="signatureCanvas" class="signature-canvas" width="400" height="150"></canvas>
+                                    <div class="signature-controls">
+                                        <button class="btn btn-outline btn-sm" onclick="clearSignature()">清除签名</button>
+                                        <small class="text-muted">请在上方区域内签名</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="batch-actions">
+                                    <button class="btn btn-primary btn-lg" onclick="executeBatchOperation()">
+                                        执行批量操作
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product info display -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">产品信息</div>
+                            <div class="card-subtitle">选择的产品详细信息</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="productDisplay" class="hidden">
+                                <div class="product-info">
+                                    <div class="product-field">
+                                        <span class="product-field-label">产品名称</span>
+                                        <span class="product-field-value" id="productName">-</span>
+                                    </div>
+                                    <div class="product-field">
+                                        <span class="product-field-label">产品条码</span>
+                                        <span class="product-field-value" id="productBarcode">-</span>
+                                    </div>
+                                    <div class="product-field">
+                                        <span class="product-field-label">产品类别</span>
+                                        <span class="product-field-value" id="productCategory">-</span>
+                                    </div>
+                                    <div class="product-field">
+                                        <span class="product-field-label">存储位置</span>
+                                        <span class="product-field-value" id="productLocation">-</span>
+                                    </div>
+                                    <div class="product-field">
+                                        <span class="product-field-label">当前库存</span>
+                                        <span class="product-field-value stock-value" id="productStock">-</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="quantity-control">
+                                    <label class="form-label">操作数量</label>
+                                    <div class="quantity-input-group">
+                                        <button class="btn-quantity" onclick="decreaseQuantity()">－</button>
+                                        <input type="number" id="quantityInput" class="quantity-display" value="1" min="1" readonly>
+                                        <button class="btn-quantity" onclick="increaseQuantity()">＋</button>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary btn-lg w-full mt-4" onclick="executeTransaction()">
+                                    ✅ 确认操作
+                                </button>
+                            </div>
+                            
+                            <div id="noProductDisplay" class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <div class="empty-state-text">请搜索产品</div>
+                                <div class="empty-state-subtext">在左侧搜索框中输入产品信息</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent transactions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <div class="card-title">最近交易记录</div>
+                        <div class="card-subtitle">显示最近5条出入库操作</div>
+                    </div>
+                    <div class="card-body">
+                        <div id="transactionsList">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory page -->
+            <div id="inventory-page" class="page-content">
+                <!-- Inventory controls -->
+                <div class="grid grid-cols-3 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="search-box">
+                                <div class="search-icon">🔍</div>
+                                <input 
+                                    type="text" 
+                                    id="searchInput" 
+                                    class="form-control search-input"
+                                    placeholder="搜索产品名称、条码或类别..."
+                                    oninput="searchProducts()"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="filter-buttons">
+                                <button class="btn btn-outline btn-sm" id="filterAll" onclick="filterProducts('all')">
+                                    � 全部产品
+                                </button>
+                                <button class="btn btn-outline btn-sm" id="filterLowStock" onclick="filterProducts('lowStock')">
+                                    ⚠️ 低库存
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="inventory-actions">
+                                <button class="btn btn-primary btn-sm" onclick="generateBarcode()">
+                                    📋 生成条码
+                                </button>
+                                <button class="btn btn-success btn-sm" onclick="addNewProduct()">
+                                    ➕ 新增产品
+                                </button>
+                                <button class="btn btn-info btn-sm" onclick="importData()">
+                                    � 导入数据
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="exportInventory()">
+                                    📊 导出数据
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product list -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">产品库存列表</div>
+                        <div class="card-subtitle">管理所有产品的库存信息</div>
+                    </div>
+                    <div class="card-body">
+                        <div id="productItems">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports page -->
+            <div id="reports-page" class="page-content">
+                <!-- Report statistics -->
+                <div class="grid grid-cols-4 mb-4">
+                    <div class="card">
+                        <div class="stat-card">
+                            <div class="stat-number" id="reportTotalProducts">-</div>
+                            <div class="stat-label">产品总数</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="reportTotalProductsProgress"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-card">
+                            <div class="stat-number" id="reportTodayTransactions">-</div>
+                            <div class="stat-label">今日交易</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="reportTodayTransactionsProgress"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-card">
+                            <div class="stat-number" id="reportLowStockItems">-</div>
+                            <div class="stat-label">低库存警告</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="reportLowStockProgress"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-card">
+                            <div class="stat-number" id="reportInventoryHealth">-</div>
+                            <div class="stat-label">库存健康度</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="reportHealthProgress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report sections -->
+                <div class="grid grid-cols-2 mb-4">
+                    <!-- Inventory status -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">库存状态分析</div>
+                            <div class="card-subtitle">产品库存分布和状态</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="inventoryStatusReport">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category distribution -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">类别分布</div>
+                            <div class="card-subtitle">产品分类统计</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="categoryDistributionReport">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction history -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">交易历史分析</div>
+                        <div class="card-subtitle">最近交易记录和趋势</div>
+                    </div>
+                    <div class="card-body">
+                        <div id="transactionHistoryReport">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report actions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <div class="card-title">报告操作</div>
+                        <div class="card-subtitle">生成和导出报告</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="report-actions">
+                            <button class="btn btn-primary btn-lg" onclick="generateReport()">
+                                📊 生成综合报告
+                            </button>
+                            <button class="btn btn-secondary btn-lg" onclick="exportReport()">
+                                📁 导出报告
+                            </button>
+                            <button class="btn btn-outline btn-lg" onclick="refreshReports()">
+                                🔄 刷新数据
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings page -->
+            <div id="settings-page" class="page-content">
+                <!-- Data Management Section -->
+                <div class="grid grid-cols-2 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">数据管理</div>
+                            <div class="card-subtitle">数据备份和传输配置</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group mb-4">
+                                <label class="form-label">数据备份</label>
+                                <button class="btn btn-primary btn-block" onclick="backupData()">
+                                    💾 立即备份数据
+                                </button>
+                                <small class="text-muted">上次备份: 2024-12-09 14:30</small>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="form-label">数据导入导出</label>
+                                <div class="btn-group-vertical w-100">
+                                    <button class="btn btn-success mb-2" onclick="downloadTemplate()">
+                                        📄 下载导入模板
+                                    </button>
+                                    <button class="btn btn-info mb-2" onclick="importDataFromFile()">
+                                        📂 导入产品数据
+                                    </button>
+                                    <input type="file" id="importFileInput" accept=".csv,.xlsx,.xls" style="display: none;" onchange="handleFileImport(this)">
+                                    <button class="btn btn-secondary mb-2" onclick="exportAllProducts()">
+                                        📊 导出所有产品
+                                    </button>
+                                </div>
+                            </div>
+
+
+                            
+                            <div class="form-group">
+                                <label class="form-label">数据传输</label>
+                                <input type="text" class="form-control" id="apiEndpoint" placeholder="API端点地址" value="http://localhost:3004/api">
+                                <button class="btn btn-secondary mt-2" onclick="testConnection()">
+                                    🔗 测试连接
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Management -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">产品类别管理</div>
+                            <div class="card-subtitle">添加和管理产品类别</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group mb-4">
+                                <label class="form-label">新建类别</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="newCategoryName" placeholder="输入类别名称">
+                                    <button class="btn btn-primary" onclick="addCategory()">
+                                        ➕ 添加类别
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">现有类别</label>
+                                <div id="categoryList" class="category-list">
+                                    <!-- Categories will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Password Management -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">管理员密码管理</div>
+                        <div class="card-subtitle">修改管理员登录密码</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid grid-cols-3">
+                            <div class="form-group">
+                                <label class="form-label">当前密码</label>
+                                <input type="password" class="form-control" id="currentPassword" placeholder="输入当前密码">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">新密码</label>
+                                <input type="password" class="form-control" id="newPassword" placeholder="输入新密码">
+                                <small class="text-muted">密码长度至少8位</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">确认密码</label>
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="再次输入新密码">
+                            </div>
+                        </div>
+                        <div class="form-actions mt-4">
+                            <button class="btn btn-primary" onclick="changePassword()">
+                                🔐 修改密码
+                            </button>
+                            <button class="btn btn-outline" onclick="clearPasswordForm()">
+                                🗑️ 清空表单
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global variables
+        let currentOperation = 'IN';
+        let currentProduct = null;
+        let currentPage = 'scanner';
+        let products = [];
+        let transactions = [];
+        let categories = [];
+        let operationMode = 'single'; // 'single' or 'batch'
+        let batchProducts = []; // Array to store batch operation products
+
+        // API base URL
+        const API_BASE = '/api';
+
+        // Utility functions
+        function showMessage(message, type = 'info') {
+            console.log('showMessage called:', message, type);
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type}`;
+            messageElement.textContent = message;
+            
+            document.body.appendChild(messageElement);
+            
+            setTimeout(() => {
+                messageElement.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(messageElement)) {
+                        document.body.removeChild(messageElement);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        async function apiRequest(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API request failed:', error);
+                showMessage(`API错误: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // Data loading functions
+        async function loadProducts() {
+            try {
+                const data = await apiRequest('/products');
+                products = data;
+                updateProductList();
+                updateStats();
+            } catch (error) {
+                console.error('Failed to load products:', error);
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                const data = await apiRequest('/transactions?limit=5');
+                transactions = data;
+                updateTransactionsList();
+            } catch (error) {
+                console.error('Failed to load transactions:', error);
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const data = await apiRequest('/categories');
+                categories = data;
+                updateCategoryList();
+            } catch (error) {
+                console.error('Failed to load categories:', error);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const stats = await apiRequest('/products/stats');
+                updateStatsDisplay(stats);
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        function updateStatsDisplay(stats) {
+            document.getElementById('totalProducts').textContent = stats.totalProducts || 0;
+            document.getElementById('lowStockItems').textContent = stats.lowStockItems || 0;
+            document.getElementById('todayTransactions').textContent = stats.todayTransactions || 0;
+            document.getElementById('totalValue').textContent = `¥${(stats.totalValue || 0).toLocaleString()}`;
+        }
+
+        function updateTransactionsList() {
+            const container = document.getElementById('transactionsList');
+            
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div class="empty-state-text">暂无交易记录</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = transactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-type ${transaction.type.toLowerCase()}">
+                        ${transaction.type}
+                    </div>
+                    <div class="transaction-info">
+                        <div class="transaction-name">${transaction.product_name}</div>
+                        <div class="transaction-details">
+                            数量: ${transaction.quantity} | ${new Date(transaction.created_at).toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="transaction-quantity">${transaction.quantity}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateProductList() {
+            const container = document.getElementById('productItems');
+            
+            if (!products || products.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <div class="empty-state-text">暂无产品</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = products.map(product => `
+                <div class="product-list-item" onclick="showProductDetails(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                    <div class="product-avatar">${product.name.charAt(0)}</div>
+                    <div class="product-info-text">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-meta">条码: ${product.barcode} | 类别: ${product.category_name || '未分类'}</div>
+                    </div>
+                    <div class="product-stock">
+                        <div class="product-stock-number ${product.stock <= product.min_stock ? 'low' : 'normal'}">
+                            ${product.stock}
+                        </div>
+                        <div class="product-stock-label">库存</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showProductDetails(product) {
+            showMessage(`产品详情: ${product.name}`, 'info');
+        }
+
+        // Page switching
+        function switchPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Remove active state from all tabs
+            document.querySelectorAll('.page-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show target page
+            document.getElementById(pageId + '-page').classList.add('active');
+            
+            // Set active tab
+            event.target.classList.add('active');
+            
+            currentPage = pageId;
+        }
+
+        // Inventory functions
+        function searchProducts() {
+            // Implementation for inventory search
+            showMessage('库存搜索功能开发中', 'info');
+        }
+
+        function filterProducts(filter) {
+            // Implementation for product filtering
+            showMessage(`切换到${filter === 'all' ? '全部' : '低库存'}筛选`, 'info');
+        }
+
+        function refreshInventory() {
+            loadProducts();
+            showMessage('库存数据已刷新', 'success');
+        }
+
+        function exportInventory() {
+            showMessage('导出功能开发中', 'info');
+        }
+
+        // Reports functions
+        function generateReport() {
+            showMessage('报告生成功能开发中', 'info');
+        }
+
+        function exportReport() {
+            showMessage('报告导出功能开发中', 'info');
+        }
+
+        function refreshReports() {
+            showMessage('报告数据已刷新', 'success');
+        }
+
+        // Operation mode functions
+        function setOperationMode(mode) {
+            console.log('setOperationMode called with:', mode);
+            operationMode = mode;
+            
+            // Update UI
+            const singleMode = document.getElementById('singleMode');
+            const batchMode = document.getElementById('batchMode');
+            
+            if (singleMode && batchMode) {
+                singleMode.classList.toggle('active', mode === 'single');
+                batchMode.classList.toggle('active', mode === 'batch');
+                console.log('Mode button styles updated successfully');
+            } else {
+                console.error('Mode button elements not found:', { singleMode: !!singleMode, batchMode: !!batchMode });
+            }
+            
+            // Show/hide batch operations panel
+            const batchPanel = document.getElementById('batchOperationsPanel');
+            if (batchPanel) {
+                if (mode === 'batch') {
+                    batchPanel.style.display = 'block';
+                    updateBatchProductList();
+                } else {
+                    batchPanel.style.display = 'none';
+                }
+            } else {
+                console.error('Batch operations panel not found');
+            }
+            
+            showMessage(`切换到${mode === 'single' ? '单品' : '批量'}模式`, 'info');
+        }
+
+        // Batch operations functions
+        function addToBatch(product) {
+            if (!product) return;
+            
+            // Check if product already exists in batch
+            const existingIndex = batchProducts.findIndex(p => p.id === product.id);
+            if (existingIndex !== -1) {
+                showMessage('该产品已在批量列表中', 'warning');
+                return;
+            }
+            
+            // Add product to batch with default quantity of 1
+            batchProducts.push({
+                ...product,
+                batchQuantity: 1
+            });
+            
+            updateBatchProductList();
+            showMessage(`已添加 ${product.name} 到批量列表`, 'success');
+        }
+
+        function removeFromBatch(productId) {
+            batchProducts = batchProducts.filter(p => p.id !== productId);
+            updateBatchProductList();
+            showMessage('已从批量列表移除', 'success');
+        }
+
+        function updateBatchQuantity(productId, quantity) {
+            const product = batchProducts.find(p => p.id === productId);
+            if (product) {
+                product.batchQuantity = Math.max(1, parseInt(quantity) || 1);
+                updateBatchProductList();
+            }
+        }
+
+        function updateBatchProductList() {
+            const container = document.getElementById('batchProductList');
+            
+            if (batchProducts.length === 0) {
+                container.innerHTML = `
+                    <div class="batch-empty-state">
+                        <div class="batch-empty-state-icon">🛒</div>
+                        <div>暂无产品</div>
+                        <div style="font-size: 12px; margin-top: 4px;">搜索并选择产品添加到批量列表</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Generate batch summary
+            const totalItems = batchProducts.length;
+            const totalQuantity = batchProducts.reduce((sum, p) => sum + p.batchQuantity, 0);
+            
+            container.innerHTML = `
+                <div class="batch-summary">
+                    <div class="batch-summary-item">
+                        <span>产品种类:</span>
+                        <span>${totalItems}</span>
+                    </div>
+                    <div class="batch-summary-item">
+                        <span>总操作数量:</span>
+                        <span>${totalQuantity}</span>
+                    </div>
+                </div>
+                ${batchProducts.map(product => `
+                    <div class="batch-product-item">
+                        <div class="batch-product-info">
+                            <div class="batch-product-name">${product.name}</div>
+                            <div class="batch-product-details">
+                                条码: ${product.barcode} | 当前库存: ${product.stock}
+                            </div>
+                        </div>
+                        <div class="batch-quantity-control">
+                            <button class="btn-quantity" onclick="updateBatchQuantity('${product.id}', ${Math.max(1, product.batchQuantity - 1)})">－</button>
+                            <input type="number" class="batch-quantity-input" value="${product.batchQuantity}" 
+                                   min="1" onchange="updateBatchQuantity('${product.id}', this.value)">
+                            <button class="btn-quantity" onclick="updateBatchQuantity('${product.id}', ${product.batchQuantity + 1})">＋</button>
+                            <button class="batch-remove-btn" onclick="removeFromBatch('${product.id}')">移除</button>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function clearBatchList() {
+            if (batchProducts.length === 0) {
+                showMessage('批量列表已经为空', 'info');
+                return;
+            }
+            
+            if (confirm('确定要清空批量列表吗？')) {
+                batchProducts = [];
+                updateBatchProductList();
+                showMessage('批量列表已清空', 'success');
+            }
+        }
+
+        async function executeBatchOperation() {
+            if (batchProducts.length === 0) {
+                showMessage('批量列表为空，请先添加产品', 'error');
+                return;
+            }
+            
+            // Check if signature information is provided
+            const requesterName = document.getElementById('batchRequesterName').value.trim();
+            const requesterDept = document.getElementById('batchRequesterDept').value.trim();
+            const purpose = document.getElementById('batchPurpose').value.trim();
+            
+            if (!requesterName) {
+                showMessage('请输入操作人员姓名', 'error');
+                return;
+            }
+            
+            if (!requesterDept) {
+                showMessage('请输入部门信息', 'error');
+                return;
+            }
+            
+            if (!purpose) {
+                showMessage('请输入操作目的', 'error');
+                return;
+            }
+            
+            if (!signatureData) {
+                showMessage('请先进行签名', 'error');
+                return;
+            }
+            
+            const operationText = currentOperation === 'IN' ? '入库' : '出库';
+            const totalItems = batchProducts.length;
+            const totalQuantity = batchProducts.reduce((sum, p) => sum + p.batchQuantity, 0);
+            
+            if (!confirm(`确定要执行批量${operationText}操作吗？\n\n产品种类: ${totalItems}\n总操作数量: ${totalQuantity}\n操作人: ${requesterName}\n部门: ${requesterDept}`)) {
+                return;
+            }
+            
+            try {
+                showMessage(`正在执行批量${operationText}操作...`, 'info');
+                
+                // Execute batch operations
+                const results = await Promise.all(
+                    batchProducts.map(async (product) => {
+                        try {
+                            const requestData = {
+                                product_id: product.id,
+                                type: currentOperation,
+                                quantity: product.batchQuantity,
+                                requester_name: requesterName,
+                                requester_department: requesterDept,
+                                purpose: purpose,
+                                signature: signatureData
+                            };
+                            
+                            console.log('Sending batch request:', requestData);
+                            
+                            const result = await apiRequest('/transactions', {
+                                method: 'POST',
+                                body: JSON.stringify(requestData)
+                            });
+                            return { success: true, product: product.name, result };
+                        } catch (error) {
+                            console.error('Batch operation failed for product:', product.name, error);
+                            return { success: false, product: product.name, error: error.message };
+                        }
+                    })
+                );
+                
+                // Process results
+                const successful = results.filter(r => r.success);
+                const failed = results.filter(r => !r.success);
+                
+                if (successful.length === results.length) {
+                    showMessage(`批量${operationText}操作成功！处理了 ${successful.length} 个产品`, 'success');
+                    
+                    // Clear batch list and form
+                    batchProducts = [];
+                    updateBatchProductList();
+                    
+                    // Clear signature form
+                    document.getElementById('batchRequesterName').value = '';
+                    document.getElementById('batchRequesterDept').value = '';
+                    document.getElementById('batchPurpose').value = '';
+                    clearSignature();
+                    
+                } else {
+                    showMessage(`批量操作部分成功：成功 ${successful.length} 个，失败 ${failed.length} 个`, 'warning');
+                    if (failed.length > 0) {
+                        console.log('Failed operations:', failed);
+                    }
+                }
+                
+                // Refresh data
+                await loadProducts();
+                await loadTransactions();
+                await loadStats();
+                
+            } catch (error) {
+                console.error('Batch operation failed:', error);
+                showMessage('批量操作失败', 'error');
+            }
+        }
+
+        // Settings and data management functions
+        
+
+
+        // Data import/export functions
+        function downloadTemplate() {
+            try {
+                // Create CSV template with correct headers matching database schema
+                const headers = [
+                    'name',           // 产品名称 (必填)
+                    'name_en',        // 英文名称
+                    'barcode',        // 条码
+                    'category_name',  // 类别名称 (必填)
+                    'location',       // 存放位置
+                    'supplier',       // 供应商
+                    'description',    // 描述
+                    'stock',          // 库存数量 (必填)
+                    'min_stock',      // 最小库存
+                    'current_unit_price'  // 单价
+                ];
+                
+                // Create sample data
+                const sampleData = [
+                    ['示例产品1', 'Sample Product 1', 'SP001', '螺丝', 'A1-01', '供应商A', '产品描述', '100', '10', '5.50'],
+                    ['示例产品2', 'Sample Product 2', 'SP002', '金属', 'A1-02', '供应商B', '产品描述', '50', '5', '12.30'],
+                    ['示例产品3', 'Sample Product 3', 'SP003', 'PP材质', 'A1-03', '供应商C', '产品描述', '200', '20', '3.25']
+                ];
+                
+                // Convert to CSV
+                const csvContent = [headers, ...sampleData]
+                    .map(row => row.map(field => `"${field}"`).join(','))
+                    .join('\\n');
+                
+                // Create and download file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `产品导入模板_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showMessage('导入模板下载成功', 'success');
+                
+            } catch (error) {
+                console.error('Template download failed:', error);
+                showMessage('模板下载失败', 'error');
+            }
+        }
+
+        function importDataFromFile() {
+            document.getElementById('importFileInput').click();
+        }
+
+        async function handleFileImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const confirmed = confirm(
+                `确定要导入文件 "${file.name}" 吗？\n\n` +
+                '导入过程中请勿关闭页面。\n' +
+                '建议在导入前先备份现有数据。'
+            );
+            
+            if (!confirmed) {
+                input.value = '';
+                return;
+            }
+            
+            try {
+                showMessage('正在处理文件，请稍候...', 'info');
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const response = await fetch('/api/products/import', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(
+                        `导入成功！\\n` +
+                        `总计: ${result.total} 条\\n` +
+                        `成功: ${result.successful} 条\\n` +
+                        `失败: ${result.failed} 条`,
+                        'success'
+                    );
+                    
+                    // Refresh data
+                    await loadProducts();
+                    await loadCategories();
+                    await loadStats();
+                } else {
+                    showMessage(`导入失败: ${result.message}`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('File import failed:', error);
+                showMessage('文件导入失败，请检查文件格式', 'error');
+            } finally {
+                input.value = '';
+            }
+        }
+
+        async function exportAllProducts() {
+            try {
+                showMessage('正在导出产品数据...', 'info');
+                
+                const response = await fetch('/api/products/export', {
+                    method: 'GET'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const blob = await response.blob();
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `产品数据导出_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showMessage('产品数据导出成功', 'success');
+                
+            } catch (error) {
+                console.error('Export failed:', error);
+                showMessage('数据导出失败', 'error');
+            }
+        }
+
+        function backupData() {
+            showMessage('数据备份功能开发中', 'info');
+        }
+
+        function testConnection() {
+            const endpoint = document.getElementById('apiEndpoint').value;
+            showMessage(`测试连接: ${endpoint}`, 'info');
+        }
+
+        // Category management functions
+        async function addCategory() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            if (!name) {
+                showMessage('请输入类别名称', 'error');
+                return;
+            }
+            
+            try {
+                await apiRequest('/categories', {
+                    method: 'POST',
+                    body: JSON.stringify({ name, description: name })
+                });
+                
+                showMessage(`类别 "${name}" 添加成功`, 'success');
+                document.getElementById('newCategoryName').value = '';
+                await loadCategories();
+                
+            } catch (error) {
+                console.error('Failed to add category:', error);
+                showMessage('添加类别失败', 'error');
+            }
+        }
+
+        function updateCategoryList() {
+            const container = document.getElementById('categoryList');
+            
+            if (!categories || categories.length === 0) {
+                container.innerHTML = '<div class="text-muted">暂无类别</div>';
+                return;
+            }
+            
+            container.innerHTML = categories.map(category => `
+                <div class="category-item">
+                    <span class="category-name">${category.name}</span>
+                    <span class="category-description">${category.description || ''}</span>
+                </div>
+            `).join('');
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load initial data
+            Promise.all([
+                loadProducts(),
+                loadTransactions(),
+                loadCategories(),
+                loadStats()
+            ]).then(() => {
+                console.log('Application initialized successfully');
+            }).catch(error => {
+                console.error('Failed to initialize application:', error);
+            });
+        });
+
+        // Search functionality
+        async function performQuickSearch() {
+            const searchTerm = document.getElementById('quickSearchInput').value.trim();
+            const resultsContainer = document.getElementById('quickSearchResults');
+            
+            if (!searchTerm) {
+                resultsContainer.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/products/search?q=${encodeURIComponent(searchTerm)}`);
+                const results = await response.json();
+                
+                if (results.length === 0) {
+                    resultsContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: #6c757d;">未找到相关产品</div>';
+                } else {
+                    resultsContainer.innerHTML = results.map(product => `
+                        <div class="search-result-item" onclick="selectProduct(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                            <div class="search-result-name">${product.name}</div>
+                            <div class="search-result-details">
+                                条码: ${product.barcode} | 类别: ${product.category_name || '未分类'}
+                                <span class="search-result-stock ${product.stock <= product.min_stock ? 'low' : 'normal'}">
+                                    库存: ${product.stock}
+                                </span>
+                            </div>
+                            ${operationMode === 'batch' ? 
+                                `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); addToBatch(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                                    ➕ 添加到批量
+                                </button>` : ''
+                            }
+                        </div>
+                    `).join('');
+                }
+                
+                resultsContainer.style.display = 'block';
+            } catch (error) {
+                console.error('Search failed:', error);
+                resultsContainer.innerHTML = '<div style="padding: 12px; text-align: center; color: #dc3545;">搜索失败</div>';
+                resultsContainer.style.display = 'block';
+            }
+        }
+
+        function handleQuickSearchInput(event) {
+            if (event.key === 'Escape') {
+                document.getElementById('quickSearchResults').style.display = 'none';
+                document.getElementById('quickSearchInput').blur();
+            }
+        }
+
+        function selectProduct(product) {
+            if (operationMode === 'batch') {
+                addToBatch(product);
+            } else {
+                currentProduct = product;
+                updateProductDisplay();
+                document.getElementById('quickSearchResults').style.display = 'none';
+            }
+        }
+
+        function setOperation(operation) {
+            console.log('setOperation called with:', operation);
+            currentOperation = operation;
+            
+            // Update button styles
+            const btnIn = document.getElementById('btnIn');
+            const btnOut = document.getElementById('btnOut');
+            
+            if (btnIn && btnOut) {
+                // Reset both buttons to outline style (gray)
+                btnIn.className = 'btn btn-outline btn-lg';
+                btnOut.className = 'btn btn-outline btn-lg';
+                
+                // Set the active button to colored style
+                if (operation === 'IN') {
+                    btnIn.className = 'btn btn-success btn-lg';
+                } else {
+                    btnOut.className = 'btn btn-success btn-lg';
+                }
+                
+                console.log('Button styles updated successfully');
+            } else {
+                console.error('Button elements not found:', { btnIn: !!btnIn, btnOut: !!btnOut });
+            }
+            
+            showMessage(`切换到${operation === 'IN' ? '入库' : '出库'}操作`, 'info');
+        }
+
+        function updateProductDisplay() {
+            if (!currentProduct) {
+                document.getElementById('productDisplay').style.display = 'none';
+                document.getElementById('noProductDisplay').style.display = 'block';
+                return;
+            }
+            
+            document.getElementById('productDisplay').style.display = 'block';
+            document.getElementById('noProductDisplay').style.display = 'none';
+            
+            document.getElementById('productName').textContent = currentProduct.name;
+            document.getElementById('productBarcode').textContent = currentProduct.barcode;
+            document.getElementById('productCategory').textContent = currentProduct.category_name || '未分类';
+            document.getElementById('productLocation').textContent = currentProduct.location || '未设置';
+            
+            const stockElement = document.getElementById('productStock');
+            stockElement.textContent = currentProduct.stock;
+            stockElement.className = `product-field-value stock-value ${currentProduct.stock <= currentProduct.min_stock ? 'low' : 'normal'}`;
+        }
+
+        function increaseQuantity() {
+            const input = document.getElementById('quantityInput');
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseQuantity() {
+            const input = document.getElementById('quantityInput');
+            const newValue = Math.max(1, parseInt(input.value) - 1);
+            input.value = newValue;
+        }
+
+        async function executeTransaction() {
+            if (!currentProduct) {
+                showMessage('请先选择产品', 'error');
+                return;
+            }
+            
+            const quantity = parseInt(document.getElementById('quantityInput').value);
+            if (!quantity || quantity < 1) {
+                showMessage('请输入有效的数量', 'error');
+                return;
+            }
+            
+            const operationText = currentOperation === 'IN' ? '入库' : '出库';
+            
+            if (!confirm(`确定要执行${operationText}操作吗？\n\n产品: ${currentProduct.name}\n数量: ${quantity}`)) {
+                return;
+            }
+            
+            try {
+                showMessage(`正在执行${operationText}操作...`, 'info');
+                
+                const requestData = {
+                    product_id: currentProduct.id,
+                    type: currentOperation,
+                    quantity: quantity,
+                    requester_name: '系统操作',
+                    requester_department: '仓库管理',
+                    purpose: `${operationText}操作`
+                };
+                
+                console.log('Sending transaction request:', requestData);
+                
+                await apiRequest('/transactions', {
+                    method: 'POST',
+                    body: JSON.stringify(requestData)
+                });
+                
+                showMessage(`${operationText}操作成功！`, 'success');
+                
+                // Reset quantity
+                document.getElementById('quantityInput').value = 1;
+                
+                // Refresh data
+                await loadProducts();
+                await loadTransactions();
+                await loadStats();
+                
+                // Update current product info
+                const updatedProduct = await apiRequest(`/products/${currentProduct.id}`);
+                currentProduct = updatedProduct;
+                updateProductDisplay();
+                
+            } catch (error) {
+                console.error('Transaction failed:', error);
+                showMessage('操作失败，请重试', 'error');
+            }
+        }
+
+        // Hide search results when clicking outside
+        // Signature functionality
+        let signatureCanvas = null;
+        let signatureCtx = null;
+        let isDrawing = false;
+        let signatureData = null;
+
+        function initSignature() {
+            signatureCanvas = document.getElementById('signatureCanvas');
+            if (!signatureCanvas) return;
+            
+            signatureCtx = signatureCanvas.getContext('2d');
+            
+            // Set up canvas for drawing
+            signatureCtx.strokeStyle = '#000';
+            signatureCtx.lineWidth = 2;
+            signatureCtx.lineCap = 'round';
+            signatureCtx.lineJoin = 'round';
+            
+            // Mouse events
+            signatureCanvas.addEventListener('mousedown', startDrawing);
+            signatureCanvas.addEventListener('mousemove', draw);
+            signatureCanvas.addEventListener('mouseup', stopDrawing);
+            signatureCanvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events for mobile
+            signatureCanvas.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                signatureCanvas.dispatchEvent(mouseEvent);
+            });
+            
+            signatureCanvas.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousemove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                signatureCanvas.dispatchEvent(mouseEvent);
+            });
+            
+            signatureCanvas.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                const mouseEvent = new MouseEvent('mouseup', {});
+                signatureCanvas.dispatchEvent(mouseEvent);
+            });
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = signatureCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            signatureCtx.beginPath();
+            signatureCtx.moveTo(x, y);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = signatureCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            signatureCtx.lineTo(x, y);
+            signatureCtx.stroke();
+        }
+
+        function stopDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            
+            // Save signature data
+            signatureData = signatureCanvas.toDataURL();
+        }
+
+        function clearSignature() {
+            if (!signatureCanvas || !signatureCtx) return;
+            
+            signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+            signatureData = null;
+            showMessage('签名已清除', 'info');
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing application...');
+            
+            // Test if all functions exist
+            console.log('Function availability:', {
+                setOperation: typeof setOperation,
+                setOperationMode: typeof setOperationMode,
+                showMessage: typeof showMessage,
+                switchPage: typeof switchPage
+            });
+            
+            // Initialize signature functionality
+            initSignature();
+            
+            // Initialize default states
+            setOperation('IN');
+            setOperationMode('single');
+            
+            // Test button functionality
+            console.log('Testing button elements...');
+            const btnIn = document.getElementById('btnIn');
+            const btnOut = document.getElementById('btnOut');
+            const singleMode = document.getElementById('singleMode');
+            const batchMode = document.getElementById('batchMode');
+            
+            console.log('Button elements found:', {
+                btnIn: !!btnIn,
+                btnOut: !!btnOut,
+                singleMode: !!singleMode,
+                batchMode: !!batchMode
+            });
+            
+            // Add additional event listeners to buttons (backup)
+            if (btnIn) {
+                btnIn.addEventListener('click', function() {
+                    console.log('IN button clicked via event listener');
+                    setOperation('IN');
+                });
+            }
+            
+            if (btnOut) {
+                btnOut.addEventListener('click', function() {
+                    console.log('OUT button clicked via event listener');
+                    setOperation('OUT');
+                });
+            }
+            
+            if (singleMode) {
+                singleMode.addEventListener('click', function() {
+                    console.log('Single mode button clicked via event listener');
+                    setOperationMode('single');
+                });
+            }
+            
+            if (batchMode) {
+                batchMode.addEventListener('click', function() {
+                    console.log('Batch mode button clicked via event listener');
+                    setOperationMode('batch');
+                });
+            }
+            
+            // Initialize page
+            if (typeof switchPage === 'function') {
+                switchPage('scanner');
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            const searchBox = document.querySelector('.search-box');
+            const resultsContainer = document.getElementById('quickSearchResults');
+            
+            if (!searchBox.contains(event.target)) {
+                resultsContainer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼音搜索测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .search-box {
+            margin: 20px 0;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #0366d6;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            padding: 12px;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            margin: 8px 0;
+            background: #f8f9fa;
+        }
+        .product-name {
+            font-weight: 600;
+            color: #1f2328;
+        }
+        .product-details {
+            color: #656d76;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .test-queries {
+            margin: 20px 0;
+        }
+        .query-button {
+            display: inline-block;
+            margin: 4px;
+            padding: 8px 12px;
+            background: #0366d6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .query-button:hover {
+            background: #0256cc;
+        }
+        .no-results {
+            text-align: center;
+            color: #656d76;
+            padding: 40px;
+        }
+        .loading {
+            text-align: center;
+            color: #656d76;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 拼音搜索功能测试</h1>
+        <p>测试中文产品名称的拼音搜索功能</p>
+        
+        <div class="search-box">
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="输入拼音或中文搜索产品，例如：pp、qiufa、chengcha..." 
+                autocomplete="off"
+            />
+        </div>
+
+        <div class="test-queries">
+            <h3>快速测试:</h3>
+            <button class="query-button" onclick="testSearch('pp')">pp</button>
+            <button class="query-button" onclick="testSearch('qiufa')">qiufa (球阀)</button>
+            <button class="query-button" onclick="testSearch('cczf')">cczf (承插)</button>
+            <button class="query-button" onclick="testSearch('flam')">flam (法兰)</button>
+            <button class="query-button" onclick="testSearch('wantou')">wantou (弯头)</button>
+            <button class="query-button" onclick="testSearch('zhijie')">zhijie (直接)</button>
+            <button class="query-button" onclick="clearSearch()">清空</button>
+        </div>
+
+        <div id="results" class="results">
+            <div class="no-results">输入关键词开始搜索</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { pinyin } from '/node_modules/pinyin/lib/esm/pinyin.js';
+
+        // 拼音工具函数
+        const pinyinUtils = {
+            toFullPinyin(text) {
+                if (!text) return '';
+                return pinyin(text, {
+                    style: 'normal',
+                    tone: false
+                }).flat().join('').toLowerCase();
+            },
+            
+            toFirstLetters(text) {
+                if (!text) return '';
+                return pinyin(text, {
+                    style: 'normal',
+                    tone: false
+                }).flat().map(p => p[0]).join('').toLowerCase();
+            },
+            
+            isMatch(text, query) {
+                if (!text || !query) return false;
+                
+                const lowerQuery = query.toLowerCase();
+                const fullPinyin = this.toFullPinyin(text);
+                const firstLetters = this.toFirstLetters(text);
+                
+                return fullPinyin.includes(lowerQuery) || 
+                       firstLetters.includes(lowerQuery) ||
+                       fullPinyin.startsWith(lowerQuery) ||
+                       firstLetters.startsWith(lowerQuery);
+            },
+            
+            getMatchScore(text, query) {
+                if (!text || !query) return 0;
+                
+                const lowerQuery = query.toLowerCase();
+                const fullPinyin = this.toFullPinyin(text);
+                const firstLetters = this.toFirstLetters(text);
+                
+                if (fullPinyin === lowerQuery || firstLetters === lowerQuery) return 100;
+                if (fullPinyin.startsWith(lowerQuery)) return 80;
+                if (firstLetters.startsWith(lowerQuery)) return 75;
+                if (fullPinyin.includes(lowerQuery)) return 50;
+                if (firstLetters.includes(lowerQuery)) return 45;
+                
+                return 0;
+            }
+        };
+
+        let allProducts = [];
+        
+        // 加载产品数据
+        async function loadProducts() {
+            try {
+                const response = await fetch('http://localhost:3003/api/products?limit=1000');
+                const data = await response.json();
+                allProducts = data.products || [];
+                console.log('加载了', allProducts.length, '个产品');
+                
+                // 预处理拼音数据
+                allProducts.forEach(product => {
+                    product.fullPinyin = pinyinUtils.toFullPinyin(product.name);
+                    product.firstLetters = pinyinUtils.toFirstLetters(product.name);
+                    console.log(`${product.name} -> ${product.fullPinyin} (${product.firstLetters})`);
+                });
+            } catch (error) {
+                console.error('加载产品失败:', error);
+            }
+        }
+
+        // 搜索函数
+        async function searchProducts(query) {
+            if (!query.trim()) {
+                return [];
+            }
+
+            const isEnglishInput = /^[a-zA-Z]+$/.test(query.trim());
+            
+            if (isEnglishInput) {
+                // 拼音搜索
+                console.log('拼音搜索:', query);
+                const matches = allProducts.filter(product => {
+                    return pinyinUtils.isMatch(product.name, query) ||
+                           (product.category_name && pinyinUtils.isMatch(product.category_name, query));
+                });
+
+                // 按匹配分数排序
+                const sortedMatches = matches.sort((a, b) => {
+                    const scoreA = pinyinUtils.getMatchScore(a.name, query) + 
+                                  (a.category_name ? pinyinUtils.getMatchScore(a.category_name, query) : 0);
+                    const scoreB = pinyinUtils.getMatchScore(b.name, query) + 
+                                  (b.category_name ? pinyinUtils.getMatchScore(b.category_name, query) : 0);
+                    return scoreB - scoreA;
+                });
+
+                console.log('拼音匹配结果:', sortedMatches.length);
+                return sortedMatches.slice(0, 10);
+            } else {
+                // 常规搜索
+                console.log('常规搜索:', query);
+                return allProducts.filter(product => 
+                    product.name.toLowerCase().includes(query.toLowerCase()) ||
+                    (product.category_name && product.category_name.toLowerCase().includes(query.toLowerCase()))
+                ).slice(0, 10);
+            }
+        }
+
+        // 显示结果
+        function displayResults(products, query) {
+            const resultsDiv = document.getElementById('results');
+            
+            if (products.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">未找到匹配的产品</div>';
+                return;
+            }
+
+            const isEnglishInput = /^[a-zA-Z]+$/.test(query.trim());
+            
+            const html = products.map(product => {
+                let highlightInfo = '';
+                if (isEnglishInput) {
+                    const score = pinyinUtils.getMatchScore(product.name, query) + 
+                                 (product.category_name ? pinyinUtils.getMatchScore(product.category_name, query) : 0);
+                    highlightInfo = ` (拼音匹配, 分数: ${score})`;
+                }
+                
+                return `
+                    <div class="result-item">
+                        <div class="product-name">${product.name}${highlightInfo}</div>
+                        <div class="product-details">
+                            条码: ${product.barcode || '未设置'} | 
+                            分类: ${product.category_name || '未分类'} | 
+                            库存: ${product.stock || 0}
+                            ${isEnglishInput ? `<br>拼音: ${product.fullPinyin} (${product.firstLetters})` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // 搜索处理函数
+        let searchTimeout;
+        async function handleSearch() {
+            const query = document.getElementById('searchInput').value;
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                if (!query.trim()) {
+                    document.getElementById('results').innerHTML = '<div class="no-results">输入关键词开始搜索</div>';
+                    return;
+                }
+
+                document.getElementById('results').innerHTML = '<div class="loading">搜索中...</div>';
+                
+                try {
+                    const results = await searchProducts(query);
+                    displayResults(results, query);
+                } catch (error) {
+                    console.error('搜索失败:', error);
+                    document.getElementById('results').innerHTML = '<div class="no-results">搜索失败，请检查网络连接</div>';
+                }
+            }, 300);
+        }
+
+        // 测试搜索函数
+        window.testSearch = function(query) {
+            document.getElementById('searchInput').value = query;
+            handleSearch();
+        };
+
+        window.clearSearch = function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('results').innerHTML = '<div class="no-results">输入关键词开始搜索</div>';
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProducts();
+            
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', handleSearch);
+            searchInput.focus();
+        });
+    </script>
+</body>
+</html>
