@@ -1,0 +1,17 @@
+[Unit]
+Description=BARCODESYS OCR service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/barcodesys/current/server
+Environment=OCR_PORT=5555
+Environment=OCR_WORKERS=2
+ExecStart=/opt/barcodesys/venv/bin/python scripts/ocr_server.py
+Restart=always
+RestartSec=5
+User=barcodesys
+Group=barcodesys
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,17 @@
+{
+    "server_port": 8766,
+    "backend_url": "http://localhost:3004",
+    "camera_index": 0,
+    "camera_width": 3840,
+    "camera_height": 2160,
+    "local_archive_dir": "./archives",
+    "temp_dir": "temp",
+    "simulate_camera": false,
+    "archive_retention_days": 60,
+    "camera_settings": {
+        "autofocus": true,
+        "auto_exposure": true,
+        "auto_wb": true,
+        "rotate_180": true
+    }
+}

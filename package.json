@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "install:all": "npm ci --prefix server && npm ci --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "npm start --prefix server",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "audit:prod": "npm_config_registry=https://registry.npmjs.org npm audit --omit=dev --prefix server && npm_config_registry=https://registry.npmjs.org npm audit --omit=dev --prefix client"
+  }
+}

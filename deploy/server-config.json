@@ -1,0 +1,13 @@
+{
+  "production": {
+    "host": "example.com",
+    "port": 22,
+    "user": "deploy-user",
+    "deploy_path": "/opt/barcodesys/current",
+    "description": "示例部署配置；真实地址和凭据请使用线下密码管理器维护"
+  },
+  "services": {
+    "frontend_port": 8080,
+    "backend_port": 3004
+  }
+}

@@ -1,0 +1,16 @@
+[Unit]
+Description=BARCODESYS inventory backend
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/barcodesys/current/server
+EnvironmentFile=/opt/barcodesys/current/server/.env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+User=barcodesys
+Group=barcodesys
+
+[Install]
+WantedBy=multi-user.target
