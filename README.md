@@ -2,6 +2,16 @@
 
 小型仓库管理系统，支持库存管理、条码扫描、OCR 单据识别、出入库流水、月度账本、Excel 导出和部署运维。
 
+## 预览
+
+### 出入库操作
+
+<img src="assets/images/spareparts-1.jpg" alt="小型仓库管理系统出入库操作截图" width="820">
+
+### 月度账本
+
+<img src="assets/images/spareparts-2.jpg" alt="小型仓库管理系统月度账本截图" width="820">
+
 ## Features
 
 - Vue 3 + Vite + Pinia 前端，覆盖库存、单据、报表、系统设置等业务页面
