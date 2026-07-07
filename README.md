@@ -1,4 +1,4 @@
-# SmallWareHouseManageSys
+# SparePartsWareHouseManageSys
 
 小型仓库管理系统，支持库存管理、条码扫描、OCR 单据识别、出入库流水、月度账本、Excel 导出和部署运维。
 
